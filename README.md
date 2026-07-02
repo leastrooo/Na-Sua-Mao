@@ -3,11 +3,9 @@
 Universidade Católica de Brasília (UCB) - 2026
 
 **Equipe de Desenvolvimento:**
-* João Victor Martins Sousa
-* João Gabriel Martins Sousa
-* Enzo Reis Alves
-* Gabriel Dias Dos Santos
+
 * Arthur Leastro Gonçalves De Siqueira
+* Enzo Reis Alves
 
 **Stack Tecnológica:** Python 3 | FastAPI | Jinja2 | TailwindCSS | SQLite / MySQL 8.0
 
