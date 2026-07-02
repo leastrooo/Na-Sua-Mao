@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Meus Aluguéis — Na Sua Mão{% endblock %}
+{% block content %}
+
+
+<div class="mb-8">
+  <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Olá, {{ usuario.nome.split()[0] }}</h1>
+  <p class="text-gray-500 text-sm mt-1">Acompanhe seus aluguéis</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+ 
+  <div class="bg-primary-600 rounded-3xl p-6 text-white shadow-soft relative overflow-hidden flex flex-col justify-between">
+   
+    <div class="absolute -right-6 -top-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+    
+    <div class="flex justify-between items-start mb-6">
+      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+      <span class="bg-white/20 text-white text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm">Pronto para saque</span>
+    </div>
+    <div>
+      <p class="text-primary-100 text-sm font-medium mb-1">Saldo Disponível</p>
+   
+      <h2 class="text-3xl font-extrabold">R$ 135,00</h2>
+    </div>
+  </div>
+
+
+  <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-soft flex flex-col justify-between">
+    <div class="flex justify-between items-start mb-6">
+      <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+      <span class="bg-gray-100 text-gray-600 text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">Em andamento</span>
+    </div>
+    <div>
+      <p class="text-gray-500 text-sm font-medium mb-1">A Receber</p>
+      <h2 class="text-3xl font-extrabold text-gray-900">R$ 90,00</h2>
+    </div>
+  </div>
+</div>
+
+
+<div class="flex gap-2 mb-6 bg-gray-50 p-1.5 rounded-2xl w-full max-w-sm border border-gray-100">
+  <button onclick="showTab('locatario')" id="tab-locatario" class="flex-1 py-2.5 px-4 text-sm font-bold rounded-xl bg-white shadow-sm text-gray-900 transition-all border border-gray-200">
+    Minhas Reservas
+  </button>
+  <button onclick="showTab('locador')" id="tab-locador" class="flex-1 py-2.5 px-4 text-sm font-bold rounded-xl text-gray-500 hover:text-gray-700 transition-all border border-transparent">
+    Meus Anúncios
+  </button>
+</div>
+
+
+<div id="tab-content-locatario" class="space-y-4">
+  {% if como_locatario %}
+    {% for r in como_locatario %}
+    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 p-5 flex flex-col sm:flex-row gap-6 items-center hover:shadow-md transition-shadow">
+      
+     
+      <div class="w-full sm:w-32 h-32 bg-gray-50 rounded-2xl border border-gray-100 flex-shrink-0 p-2 relative overflow-hidden flex items-center justify-center">
+        {% if r.ferramenta.foto1 %}
+          <img src="{{ r.ferramenta.foto1 }}" class="w-full h-full object-contain">
+        {% else %}
+          <span class="text-3xl">🔧</span>
+        {% endif %}
+      </div>
+
+      
+      <div class="flex-grow w-full">
+        <div class="flex items-center gap-2 mb-2">
+          {% if r.status_reserva.value == 'Em Uso' %}
+            <span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">EM USO</span>
+            <span class="text-xs text-gray-500 font-medium">Devolução até as 18h</span>
+          {% elif r.status_reserva.value == 'Confirmado' %}
+            <span class="bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">AGUARDANDO RETIRADA</span>
+          {% else %}
+            <span class="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">{{ r.status_reserva.value }}</span>
+          {% endif %}
+        </div>
+        
+        <h3 class="font-bold text-gray-900 text-lg mb-1">{{ r.ferramenta.titulo }}</h3>
+        <p class="text-sm text-gray-500">Proprietário: {{ r.ferramenta.locador.nome.split()[0] }} • R$ {{ "%.2f"|format(r.valor_total_calculado) }}</p>
+      </div>
+
+      
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
+        <a href="/reservas/{{ r.id_reserva }}" class="text-center px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors whitespace-nowrap">
+          Detalhes
+        </a>
+        <a href="/reservas/{{ r.id_reserva }}" class="text-center px-6 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm whitespace-nowrap">
+          Acompanhar
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-center py-16 bg-white rounded-3xl border border-gray-100 shadow-soft">
+      <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-2xl text-gray-400">🛒</span>
+      </div>
+      <p class="text-gray-500 font-medium text-base mb-4">Você ainda não alugou nenhuma ferramenta.</p>
+      <a href="/" class="inline-block bg-primary-600 text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-primary-700 transition-colors shadow-md">Explorar Catálogo</a>
+    </div>
+  {% endif %}
+</div>
+
+
+<div id="tab-content-locador" class="hidden space-y-4">
+  {% if como_locador %}
+    {% for r in como_locador %}
+    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 p-5 flex flex-col sm:flex-row gap-6 items-center hover:shadow-md transition-shadow">
+      
+      <div class="w-full sm:w-32 h-32 bg-gray-50 rounded-2xl border border-gray-100 flex-shrink-0 p-2 relative overflow-hidden flex items-center justify-center">
+        {% if r.ferramenta.foto1 %}
+          <img src="{{ r.ferramenta.foto1 }}" class="w-full h-full object-contain">
+        {% else %}
+          <span class="text-3xl">🔧</span>
+        {% endif %}
+      </div>
+
+      <div class="flex-grow w-full">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="bg-blue-100 text-primary-700 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">{{ r.status_reserva.value }}</span>
+          <span class="text-xs text-gray-500 font-medium">+ R$ {{ "%.2f"|format(r.valor_total_calculado) }}</span>
+        </div>
+        
+        <h3 class="font-bold text-gray-900 text-lg mb-1">{{ r.ferramenta.titulo }}</h3>
+        <p class="text-sm text-gray-500">Locatário: {{ r.locatario.nome.split()[0] }} • Pedido #{{ r.id_reserva }}</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
+        <a href="/reservas/{{ r.id_reserva }}" class="text-center px-6 py-2.5 bg-primary-50 text-primary-600 border border-primary-100 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors whitespace-nowrap">
+          Gerenciar Pedido
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-center py-16 bg-white rounded-3xl border border-gray-100 shadow-soft">
+      <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-2xl text-gray-400">📥</span>
+      </div>
+      <p class="text-gray-500 font-medium text-base mb-4">Nenhum pedido recebido ainda.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function showTab(name) {
+  
+  ['locatario','locador'].forEach(t => {
+    document.getElementById('tab-content-' + t).classList.add('hidden');
+    const tabBtn = document.getElementById('tab-' + t);
+    tabBtn.classList.remove('bg-white','shadow-sm','text-gray-900', 'border-gray-200');
+    tabBtn.classList.add('text-gray-500', 'border-transparent');
+  });
+  
+  document.getElementById('tab-content-' + name).classList.remove('hidden');
+  const activeBtn = document.getElementById('tab-' + name);
+  activeBtn.classList.remove('text-gray-500', 'border-transparent');
+  activeBtn.classList.add('bg-white','shadow-sm','text-gray-900', 'border-gray-200');
+}
+</script>
+{% endblock %}

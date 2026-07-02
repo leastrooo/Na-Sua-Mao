@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Minhas Ferramentas — Na Sua Mão{% endblock %}
+{% block content %}
+
+
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Minhas Ferramentas</h1>
+    <p class="text-sm text-gray-500 mt-1">{{ ferramentas|length }} ferramenta(s) no seu catálogo</p>
+  </div>
+  <a href="/ferramentas/nova" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3.5 rounded-2xl font-bold text-sm transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 whitespace-nowrap text-center">
+    + Anunciar Ferramenta
+  </a>
+</div>
+
+{% if ferramentas %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for f in ferramentas %}
+  <div class="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300">
+    
+    
+    <div class="aspect-[4/3] bg-white p-6 relative flex items-center justify-center border-b border-gray-50">
+      <div class="absolute top-4 right-4 z-10">
+        <span class="bg-gray-100/90 backdrop-blur-sm text-gray-800 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider shadow-sm">
+          {{ f.categoria.nome_categoria }}
+        </span>
+      </div>
+      
+      {% if f.foto1 %}
+        <img src="{{ f.foto1 }}" class="w-full h-full object-contain">
+      {% else %}
+        <div class="text-6xl text-gray-200">🔧</div>
+      {% endif %}
+    </div>
+    
+   
+    <div class="p-6 flex-grow flex flex-col justify-between">
+      <div class="mb-5">
+        <h3 class="font-bold text-gray-900 text-lg mb-1 line-clamp-1" title="{{ f.titulo }}">{{ f.titulo }}</h3>
+        <p class="text-2xl font-extrabold text-primary-600">R$ {{ "%.2f"|format(f.preco_diaria) }} <span class="text-xs text-gray-400 font-medium">/dia</span></p>
+      </div>
+      
+      
+      <div class="pt-5 border-t border-gray-50 mt-auto space-y-3">
+        <form method="POST" action="/ferramentas/{{ f.id_ferramenta }}/status" class="flex gap-2">
+          <select name="novo_status" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none font-bold text-gray-700 cursor-pointer appearance-none">
+            <option value="Disponível" {% if f.status_ferramenta.value == 'Disponível' %}selected{% endif %}>🟢 Disponível</option>
+            <option value="Em Manutenção" {% if f.status_ferramenta.value == 'Em Manutenção' %}selected{% endif %}>🟠 Manutenção</option>
+            <option value="Inativa" {% if f.status_ferramenta.value == 'Inativa' %}selected{% endif %}>🔴 Inativa</option>
+            <option value="Alugada" {% if f.status_ferramenta.value == 'Alugada' %}selected{% endif %} disabled>🔵 Alugada</option>
+          </select>
+          <button type="submit" class="bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm">
+            Mudar
+          </button>
+        </form>
+        
+        <a href="/ferramentas/{{ f.id_ferramenta }}" class="block w-full text-center bg-primary-50 text-primary-600 hover:bg-primary-100 py-2.5 rounded-xl text-sm font-bold transition-colors">
+          Ver anúncio público
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+
+<div class="text-center py-20 bg-white rounded-3xl shadow-soft border border-gray-100">
+  <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-5">
+    <span class="text-3xl">📦</span>
+  </div>
+  <h2 class="text-xl font-bold text-gray-900 mb-2">O seu catálogo está vazio</h2>
+  <p class="text-gray-500 text-sm mb-8 max-w-sm mx-auto leading-relaxed">Anuncie as ferramentas que não usa e comece a gerar rendimento extra com a vizinhança.</p>
+  <a href="/ferramentas/nova" class="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+    Criar Primeiro Anúncio
+  </a>
+</div>
+{% endif %}
+{% endblock %}

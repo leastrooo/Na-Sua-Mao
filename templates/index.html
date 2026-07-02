@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Na Sua Mão — Ferramentas na sua Vizinhança{% endblock %}
+{% block content %}
+
+
+<div class="mb-10 text-center md:text-left">
+  <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Ferramentas na sua Vizinhança</h1>
+  <p class="text-gray-500 text-base">Encontre o que você precisa a poucos metros de casa e economize!</p>
+</div>
+
+
+<div class="bg-white p-6 rounded-3xl shadow-soft border border-gray-100 mb-10 max-w-5xl mx-auto md:mx-0">
+  <form method="GET" action="/" class="flex flex-col md:flex-row gap-6 items-end">
+    
+    
+    <div class="flex-1 w-full">
+      <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">O que você procura?</label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <input type="text" name="busca" value="{{ busca }}"
+               placeholder="Ex: Furadeira, Escada..."
+               class="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-medium">
+      </div>
+    </div>
+
+    
+    <div class="w-full md:w-56">
+      <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Categoria</label>
+      <div class="relative">
+        <select name="categoria" class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-medium cursor-pointer appearance-none">
+          <option value="">Todas as categorias</option>
+          {% for cat in categorias %}
+            <option value="{{ cat }}" {% if categoria_sel == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+        
+        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="w-full md:w-48 pb-2">
+      <div class="flex justify-between items-center mb-3">
+        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Distância Máxima</label>
+        
+        <span id="distancia-valor" class="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded">2.5 KM</span>
+      </div>
+      <div class="relative flex items-center">
+        <input type="range" name="distancia" id="distancia" min="1" max="5" step="0.5" value="2.5" 
+               class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+               oninput="document.getElementById('distancia-valor').textContent = this.value + ' KM'">
+      </div>
+    </div>
+
+    
+    <div class="w-full md:w-auto">
+      <button type="submit" class="w-full bg-gray-900 hover:bg-black text-white px-8 py-3.5 rounded-2xl font-bold text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap">
+        Aplicar Filtros
+      </button>
+    </div>
+  </form>
+</div>
+
+
+{% if ferramentas %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+  {% for f in ferramentas %}
+  <div class="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col group relative">
+    
+    
+    <div class="aspect-[4/3] bg-white p-6 relative flex items-center justify-center">
+      
+      <div class="absolute top-4 right-4 z-10">
+        {% if f.status_ferramenta.value == 'Disponível' %}
+          <span class="bg-green-100 text-green-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">Disponível Hoje</span>
+        {% else %}
+          <span class="bg-yellow-100 text-yellow-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">Indisponível</span>
+        {% endif %}
+      </div>
+      
+      {% if f.foto1 %}
+        <img src="{{ f.foto1 }}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+      {% else %}
+        <div class="text-6xl text-gray-200">🔧</div>
+      {% endif %}
+    </div>
+
+    
+    <div class="p-6 flex-grow flex flex-col justify-between border-t border-gray-50">
+      <div>
+        <h3 class="font-bold text-gray-900 text-lg mb-2 line-clamp-1 group-hover:text-primary-600 transition-colors" title="{{ f.titulo }}">{{ f.titulo }}</h3>
+        <p class="text-sm text-gray-500 line-clamp-2 mb-4 leading-relaxed">{{ f.descricao }}</p>
+        
+        <div class="mb-5">
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Diária</p>
+          <div class="flex items-baseline gap-1">
+            <span class="text-xl font-extrabold text-primary-600">R$ {{ "%.2f"|format(f.preco_diaria) }}</span>
+            <span class="text-xs font-medium text-gray-400">,00</span>
+          </div>
+        </div>
+      </div>
+      
+      
+      <a href="/ferramentas/{{ f.id_ferramenta }}" class="block w-full text-center bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white py-3 rounded-2xl font-bold text-sm transition-colors border border-primary-100 hover:border-primary-600">
+        Reservar Agora
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-20 bg-white rounded-3xl shadow-soft border border-gray-100">
+  <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-5">
+    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+  </div>
+  <p class="text-xl font-bold mb-2 text-gray-800">Nenhuma ferramenta encontrada</p>
+  <p class="text-gray-500 mb-8 max-w-sm mx-auto">Tente ajustar seus filtros de busca ou distância, ou seja o primeiro a anunciar!</p>
+  {% if usuario %}
+    <a href="/ferramentas/nova" class="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-3.5 rounded-2xl font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+      + Anunciar Ferramenta
+    </a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

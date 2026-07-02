@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}Solicitação #{{ reserva.id_reserva }} — Na Sua Mão{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <a href="/meus-alugueis" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary-600 transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    Voltar
+  </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+  
+  
+  <div class="lg:col-span-4 space-y-6">
+    
+    
+    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 p-6 flex items-center gap-4">
+      {% set outra_parte = reserva.locatario if eh_locador else reserva.ferramenta.locador %}
+      <div class="w-14 h-14 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xl font-bold flex-shrink-0">
+        {{ outra_parte.nome[0].upper() }}
+      </div>
+      <div>
+        <h3 class="font-bold text-gray-900">{{ outra_parte.nome.split()[0] }}</h3>
+        <p class="text-xs text-green-600 font-medium">Online agora</p>
+      </div>
+    </div>
+
+    
+    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 p-6">
+      
+      <div class="flex justify-between items-start mb-4 pb-4 border-b border-gray-50">
+        <div>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Solicitação de Reserva</p>
+          <h2 class="text-lg font-bold text-gray-900 leading-tight">{{ reserva.ferramenta.titulo }}</h2>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-500">Período</span>
+          <span class="font-bold text-gray-900">{{ reserva.data_prevista_inicio.strftime('%d/%m') }} a {{ reserva.data_prevista_fim.strftime('%d/%m') }}</span>
+        </div>
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-500">Status atual</span>
+          <span class="font-bold text-primary-600">{{ reserva.status_reserva.value }}</span>
+        </div>
+        <div class="flex justify-between items-center text-sm pt-4 border-t border-gray-50">
+          <span class="text-gray-900 font-bold">Total a receber/pagar</span>
+          <span class="font-bold text-green-600 text-lg">R$ {{ "%.2f"|format(reserva.valor_total_calculado) }}</span>
+        </div>
+      </div>
+
+      
+      <div class="space-y-3">
+        {% if eh_locador %}
+          {% if reserva.status_reserva.value == 'Aguardando aprovação' %}
+            <form method="POST" action="/reservas/{{ reserva.id_reserva }}/confirmar">
+              <button class="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-2xl font-bold shadow-md transition-all">Aprovar Aluguel</button>
+            </form>
+            <form method="POST" action="/reservas/{{ reserva.id_reserva }}/cancelar">
+              <input type="hidden" name="motivo" value="Recusado pelo locador">
+              <button class="w-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 py-3 rounded-2xl font-bold transition-all">Recusar</button>
+            </form>
+          {% elif reserva.status_reserva.value == 'Confirmado' %}
+            <form method="POST" action="/reservas/{{ reserva.id_reserva }}/entregar">
+              <button class="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-2xl font-bold shadow-md transition-all">Registrar Retirada</button>
+            </form>
+          {% elif reserva.status_reserva.value == 'Em Uso' %}
+            <form method="POST" action="/reservas/{{ reserva.id_reserva }}/devolver">
+              <button class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-2xl font-bold shadow-md transition-all">Confirmar Devolução</button>
+            </form>
+          {% endif %}
+        {% endif %}
+
+        {% if reserva.status_reserva.value == 'Aguardando aprovação' and eh_locatario %}
+          <form method="POST" action="/reservas/{{ reserva.id_reserva }}/cancelar">
+            <input type="hidden" name="motivo" value="Cancelado pelo locatário">
+            <button class="w-full border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 py-3 rounded-2xl font-bold transition-all">Cancelar Solicitação</button>
+          </form>
+        {% endif %}
+      </div>
+
+      
+      {% if reserva.contrato %}
+      <div class="mt-6 bg-gray-50 rounded-2xl p-4 border border-gray-200 flex gap-3 items-start">
+        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        <div>
+          <p class="text-xs font-bold text-gray-900 mb-1">Aluguel Protegido</p>
+          <p class="text-[11px] text-gray-500">Contrato digital ativo. Os dados de contato foram liberados para combinar a entrega.</p>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    
+    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 p-6">
+
+      {% if denuncia %}
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center text-lg">⚖️</div>
+          <h3 class="font-bold text-gray-900">Denúncia Registrada</h3>
+        </div>
+        <div class="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-gray-500 font-semibold uppercase tracking-wider">Motivo</span>
+            <span class="font-bold text-gray-900">{{ denuncia.motivo }}</span>
+          </div>
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-gray-500 font-semibold uppercase tracking-wider">Status</span>
+            <span class="font-bold text-orange-600">{{ denuncia.status_denuncia.value }}</span>
+          </div>
+          {% if denuncia.resolucao %}
+          <div class="pt-2 mt-2 border-t border-orange-100">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Resolução</p>
+            <p class="text-xs text-gray-700">{{ denuncia.resolucao }}</p>
+          </div>
+          {% endif %}
+        </div>
+
+      {% elif reserva.status_reserva.value in ['Confirmado', 'Em Uso', 'Finalizado'] %}
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-red-50 text-red-600 rounded-full flex items-center justify-center text-lg">⚠️</div>
+          <h3 class="font-bold text-gray-900">Algum problema?</h3>
+        </div>
+        <form method="POST" action="/reservas/{{ reserva.id_reserva }}/denuncia" class="space-y-3">
+          <select name="motivo" required
+                  class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-all">
+            <option value="" disabled selected>Selecione o motivo</option>
+            <option value="Item danificado">Item danificado</option>
+            <option value="Comportamento inadequado">Comportamento inadequado</option>
+            <option value="Atraso na devolução">Atraso na devolução</option>
+            <option value="Item diferente do anunciado">Item diferente do anunciado</option>
+            <option value="Outro">Outro</option>
+          </select>
+          <textarea name="descricao" required rows="3" minlength="10"
+                    placeholder="Descreva o que aconteceu..."
+                    class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-all resize-none"></textarea>
+          <button type="submit"
+                  class="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 py-3 rounded-2xl font-bold text-sm transition-all">
+            Abrir Denúncia
+          </button>
+        </form>
+      {% endif %}
+
+    </div>
+  </div>
+
+  
+  <div class="lg:col-span-8">
+    <div class="bg-white rounded-3xl shadow-soft border border-gray-100 flex flex-col h-[600px] overflow-hidden relative">
+      
+      
+      <div class="absolute inset-0 bg-[#f8fafc] opacity-50 pointer-events-none z-0"></div>
+
+      
+      <div class="px-6 py-5 border-b border-gray-100 bg-white z-10 flex items-center justify-between">
+        <h3 class="font-bold text-gray-900">Mensagens</h3>
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+      </div>
+      
+      
+      <div class="flex-grow p-6 overflow-y-auto space-y-4 z-10" id="chat-area">
+        {% if mensagens %}
+          {% for msg in mensagens %}
+            <div class="flex flex-col {% if msg.id_remetente == usuario.id_usuario %}items-end{% else %}items-start{% endif %}">
+              <div class="max-w-[75%] px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm
+                {% if msg.id_remetente == usuario.id_usuario %}
+                  bg-primary-600 text-white rounded-br-sm
+                {% else %}
+                  bg-white border border-gray-100 text-gray-800 rounded-bl-sm
+                {% endif %}">
+                {{ msg.conteudo }}
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1.5 font-medium">{{ msg.data_envio.strftime('%H:%M') }}</p>
+            </div>
+          {% endfor %}
+        {% else %}
+         
+          <div class="h-full flex flex-col items-center justify-center text-center">
+            <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4">
+              <svg class="w-8 h-8 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            </div>
+            <h4 class="font-bold text-gray-900 mb-1">Inicie a conversa</h4>
+            <p class="text-xs text-gray-500 max-w-[200px]">Envie uma mensagem para combinar os detalhes e horários da retirada.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div class="p-5 bg-white border-t border-gray-100 z-10">
+        <form method="POST" action="/reservas/{{ reserva.id_reserva }}/mensagem" class="flex items-center gap-3 bg-gray-50 rounded-full p-1.5 pr-2 border border-gray-200">
+          <button type="button" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+          </button>
+          
+          <input type="text" name="conteudo" required placeholder="Escreva uma mensagem..." 
+                 class="flex-1 bg-transparent border-none text-sm focus:outline-none focus:ring-0 text-gray-800 px-2 placeholder-gray-400">
+          
+          <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-sm focus:outline-none">
+            <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+const chatArea = document.getElementById('chat-area');
+if(chatArea) {
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+</script>
+{% endblock %}

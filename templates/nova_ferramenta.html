@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Anunciar Ferramenta — Na Sua Mão{% endblock %}
+{% block content %}
+
+<div class="max-w-3xl mx-auto py-6">
+  
+  
+  <div class="flex items-center gap-2 text-sm text-gray-500 mb-6 px-2">
+    <a href="/" class="hover:text-primary-600 transition-colors">Início</a>
+    <span class="text-gray-300">/</span>
+    <a href="/minhas-ferramentas" class="hover:text-primary-600 transition-colors">Minhas Ferramentas</a>
+    <span class="text-gray-300">/</span>
+    <span class="text-gray-900 font-medium">Novo Anúncio</span>
+  </div>
+
+  <div class="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden p-8 md:p-10">
+    
+    
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Anuncie sua ferramenta</h1>
+      <p class="text-gray-500 text-sm">Preencha os detalhes e comece a gerar renda extra com seus vizinhos.</p>
+    </div>
+
+    {% if erro %}
+    <div class="bg-red-50 text-red-600 rounded-2xl px-4 py-3 mb-8 text-sm font-medium flex items-center gap-3 border border-red-100">
+      <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+      {{ erro }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/ferramentas/nova" enctype="multipart/form-data" class="space-y-8">
+
+      
+      <div class="space-y-5">
+        <div>
+          <label class="block text-sm font-bold text-gray-700 mb-2">Título do Anúncio</label>
+          <input type="text" name="nome" required placeholder="Ex: Furadeira de Impacto Bosch 650W"
+                 class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all shadow-sm">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Categoria</label>
+            <select name="categoria" required
+                    class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all shadow-sm cursor-pointer appearance-none">
+              <option value="">Selecione...</option>
+              {% for cat in categorias %}
+                <option value="{{ cat }}">{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Valor da Diária (R$)</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">R$</span>
+              <input type="number" name="valor_diaria" required min="1" step="0.50" placeholder="0,00"
+                     class="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-10 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all shadow-sm">
+            </div>
+          </div>
+        </div>
+      </div>
+
+        
+        <div class="grid grid-cols-5 gap-3">
+          {% for i in range(1, 6) %}
+          <label class="relative cursor-pointer group w-full aspect-square block">
+            <div class="w-full h-full bg-white rounded-xl border border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-500 transition-colors overflow-hidden shadow-sm"
+                 id="preview-box-{{ i }}">
+              <div id="preview-placeholder-{{ i }}" class="flex flex-col items-center">
+                <span class="text-xl">+</span>
+              </div>
+              <img id="preview-img-{{ i }}" class="hidden absolute inset-0 w-full h-full object-cover">
+            </div>
+            <input type="file" name="foto{{ i }}" accept="image/*" class="hidden" onchange="previewFoto(this, {{ i }})">
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      
+      <div>
+        <label class="block text-sm font-bold text-gray-700 mb-2">Descrição</label>
+        <textarea name="descricao" required rows="4"
+                  placeholder="Descreva detalhes técnicos, restrições de uso, acessórios inclusos..."
+                  class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all shadow-sm resize-none"></textarea>
+      </div>
+
+      
+      <div class="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" required class="mt-1 w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 accent-primary-600">
+          <span class="text-sm text-gray-700 font-medium">
+            Confirmo que a ferramenta está em perfeito estado de funcionamento. Itens com defeito ou avarias de segurança não são permitidos.
+          </span>
+        </label>
+      </div>
+
+      
+      <div class="flex flex-col sm:flex-row gap-4 pt-2">
+        <button type="submit" class="w-full sm:flex-1 bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-2xl font-bold text-base transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+          Publicar Anúncio
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function previewFoto(input, idx) {
+  const file = input.files[0];
+  if (file) {
+    const url = URL.createObjectURL(file);
+    document.getElementById(`preview-img-${idx}`).src = url;
+    document.getElementById(`preview-img-${idx}`).classList.remove('hidden');
+    document.getElementById(`preview-placeholder-${idx}`).classList.add('hidden');
+  }
+}
+</script>
+{% endblock %}

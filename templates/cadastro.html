@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Criar Conta — Na Sua Mão{% endblock %}
+{% block content %}
+
+<div class="max-w-3xl mx-auto py-6">
+  <div class="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden p-8 md:p-10">
+    
+   
+    <div class="text-center mb-10">
+      <h2 class="text-primary-600 font-bold text-lg mb-2">Na sua mão</h2>
+      <h1 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Junte-se à vizinhança</h1>
+      <p class="text-gray-500 text-sm">Crie sua conta para alugar ou anunciar ferramentas.</p>
+    </div>
+
+    {% if erro %}
+    <div class="bg-red-50 text-red-600 rounded-2xl px-4 py-3 mb-8 text-sm font-medium flex items-center gap-3 border border-red-100">
+      <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+      {{ erro }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/cadastro" class="space-y-8" onsubmit="return validarSenhas()">
+      
+      
+      <div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Nome Completo</label>
+            <input type="text" name="nome" required placeholder="Ex: João da Silva" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">E-mail</label>
+            <input type="email" name="email" required placeholder="seu@email.com" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Data de Nascimento</label>
+            <input type="date" name="data_nascimento" required 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">CPF</label>
+            <input type="text" name="cpf" id="cpf-input" required placeholder="000.000.000-00" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Telefone</label>
+            <input type="text" name="telefone" placeholder="(61) 99999-9999" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+        </div>
+      </div>
+
+      
+      <div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Bairro</label>
+            <input type="text" name="bairro" placeholder="Ex: Asa Norte" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Endereço Completo</label>
+            <input type="text" name="endereco" placeholder="Ex: SQN 210, Bloco B, Apto 101" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+        </div>
+      </div>
+
+      
+      <div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Senha</label>
+            <input type="password" name="senha" id="senha1" required placeholder="Mínimo 8 caracteres" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Confirmar Senha</label>
+            <input type="password" name="senha2" id="senha2" required placeholder="Repita a senha" 
+                   class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm">
+            <p id="senha-erro" class="text-xs text-red-500 mt-2 hidden font-medium">As senhas não coincidem.</p>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="flex items-center gap-3 py-2">
+        <input type="checkbox" required id="termos" class="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 accent-primary-600">
+        <label for="termos" class="text-sm text-gray-600">
+          Declaro que li e concordo com os <a href="#" class="text-primary-600 font-bold hover:underline">Termos de Uso</a> e a <a href="#" class="text-primary-600 font-bold hover:underline">Política de Privacidade</a>.
+        </label>
+      </div>
+
+      <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-2xl font-bold text-base transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+        Criar minha conta
+      </button>
+    </form>
+
+    <div class="mt-8 text-center text-sm text-gray-500">
+      Já tem uma conta? <a href="/login" class="text-primary-600 hover:text-primary-700 font-bold ml-1 hover:underline transition-colors">Faça login aqui</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('cpf-input').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g, '');
+  if (v.length <= 11) {
+    v = v.replace(/(\d{3})(\d)/, '$1.$2')
+         .replace(/(\d{3})(\d)/, '$1.$2')
+         .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  }
+  e.target.value = v;
+});
+
+function validarSenhas() {
+  const s1 = document.getElementById('senha1').value;
+  const s2 = document.getElementById('senha2').value;
+  const erro = document.getElementById('senha-erro');
+  
+  if (s1 !== s2) {
+    erro.classList.remove('hidden');
+    document.getElementById('senha2').classList.add('border-red-500', 'bg-red-50');
+    return false;
+  }
+  erro.classList.add('hidden');
+  document.getElementById('senha2').classList.remove('border-red-500', 'bg-red-50');
+  return true;
+}
+
+document.getElementById('senha2').addEventListener('input', validarSenhas);
+</script>
+{% endblock %}

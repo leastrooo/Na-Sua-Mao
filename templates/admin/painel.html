@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Painel Admin — Na Sua Mão{% endblock %}
+{% block content %}
+
+
+<div class="mb-10">
+  <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">⚙️ Painel de Administração</h1>
+  <p class="text-sm text-gray-500 mt-2">Visão geral da plataforma e moderação de conteúdo.</p>
+</div>
+
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+
+  <div class="bg-primary-600 text-white rounded-3xl p-8 shadow-soft relative overflow-hidden flex flex-col justify-between h-40">
+    <div class="absolute -right-8 -top-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+    <p class="text-primary-100 text-[11px] font-bold uppercase tracking-wider">Utilizadores Registados</p>
+    <div class="flex justify-between items-end">
+      <p class="text-5xl font-black">{{ total_usuarios }}</p>
+      <span class="text-4xl opacity-50 mb-1">👥</span>
+    </div>
+  </div>
+  
+
+  <div class="bg-green-600 text-white rounded-3xl p-8 shadow-soft relative overflow-hidden flex flex-col justify-between h-40">
+    <div class="absolute -right-8 -top-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+    <p class="text-green-100 text-[11px] font-bold uppercase tracking-wider">Ferramentas no Catálogo</p>
+    <div class="flex justify-between items-end">
+      <p class="text-5xl font-black">{{ total_ferramentas }}</p>
+      <span class="text-4xl opacity-50 mb-1">🔧</span>
+    </div>
+  </div>
+  
+
+  <div class="bg-orange-500 text-white rounded-3xl p-8 shadow-soft relative overflow-hidden flex flex-col justify-between h-40">
+    <div class="absolute -right-8 -top-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+    <p class="text-orange-100 text-[11px] font-bold uppercase tracking-wider">Transações Realizadas</p>
+    <div class="flex justify-between items-end">
+      <p class="text-5xl font-black">{{ total_reservas }}</p>
+      <span class="text-4xl opacity-50 mb-1">🔄</span>
+    </div>
+  </div>
+</div>
+
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  
+  
+  <div class="bg-white rounded-3xl shadow-soft border border-gray-100 flex flex-col">
+    <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-white rounded-t-3xl">
+      <h2 class="font-extrabold text-gray-900 text-lg">⚖️ Denúncias Pendentes</h2>
+      {% if denuncias %}
+        <span class="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-bold">{{ denuncias|length }} novas</span>
+      {% endif %}
+    </div>
+    
+    <div class="p-8 flex-grow">
+      {% if denuncias %}
+      <div class="space-y-4">
+        {% for d in denuncias %}
+        <div class="bg-orange-50/50 border border-orange-100 rounded-2xl p-5 hover:shadow-md transition-shadow group">
+          <div class="flex justify-between items-start mb-3">
+            <span class="text-[10px] font-bold text-orange-800 uppercase tracking-wider bg-orange-100 px-2.5 py-1 rounded-md">#{{ d.id_denuncia }} • {{ d.motivo }}</span>
+            <span class="text-[10px] font-bold text-orange-600 uppercase tracking-wider flex items-center gap-1.5">⏱️ {{ d.status_denuncia.value }}</span>
+          </div>
+          <p class="text-sm text-gray-700 mb-4 line-clamp-2 leading-relaxed">{{ d.descricao }}</p>
+          <a href="/admin/denuncias/{{ d.id_denuncia }}" class="text-sm font-bold text-primary-600 group-hover:text-primary-700 transition-colors inline-flex items-center gap-1">
+            Analisar Caso Completo <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-10">
+        <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">✓</div>
+        <h3 class="font-bold text-gray-900 mb-1">Tudo tranquilo!</h3>
+        <p class="text-sm text-gray-500 font-medium">Não há denúncias aguardando análise no momento.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  
+  <div class="bg-white rounded-3xl shadow-soft border border-gray-100 flex flex-col h-fit">
+    <div class="px-8 py-6 border-b border-gray-50 bg-white rounded-t-3xl">
+      <h2 class="font-extrabold text-gray-900 text-lg">🛠️ Acesso Rápido</h2>
+    </div>
+    <div class="p-8 space-y-4">
+      <a href="/admin/usuarios" class="flex items-center justify-between w-full bg-gray-50 hover:bg-gray-100 border border-gray-100 text-gray-800 px-6 py-5 rounded-2xl font-bold transition-all hover:shadow-sm">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-primary-600 text-lg">👥</div>
+          <span>Gestão de Utilizadores</span>
+        </div>
+        <span class="text-gray-400">→</span>
+      </a>
+      
+      
+      <button class="flex items-center justify-between w-full bg-gray-50 text-gray-400 px-6 py-5 rounded-2xl font-bold border border-transparent cursor-not-allowed opacity-60">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-lg">⚙️</div>
+          <span>Configurações do Sistema</span>
+        </div>
+        <span class="text-[10px] uppercase tracking-wider bg-gray-200 text-gray-500 px-2.5 py-1 rounded-md">Em Breve</span>
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}O Meu Perfil — Na Sua Mão{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  
+  <div class="mb-10">
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">O Meu Perfil</h1>
+    <p class="text-sm text-gray-500 mt-1">Gerencie suas informações e preferências.</p>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 text-red-600 rounded-2xl px-4 py-3 mb-8 text-sm font-medium border border-red-100 flex items-center gap-3">
+    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+    {{ erro }}
+  </div>
+  {% endif %}
+  {% if sucesso %}
+  <div class="bg-green-50 text-green-700 rounded-2xl px-4 py-3 mb-8 text-sm font-medium border border-green-100 flex items-center gap-3">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    {{ sucesso }}
+  </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+    
+    
+    <div class="md:col-span-4 bg-white rounded-3xl shadow-soft border border-gray-100 p-8 text-center sticky top-24">
+      <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-primary-600 to-primary-400 text-white flex items-center justify-center text-4xl font-bold mx-auto mb-5 shadow-lg border-4 border-white relative">
+        {% if usuario.foto %}
+          <img src="{{ usuario.foto }}" class="w-full h-full rounded-full object-cover">
+        {% else %}
+          {{ usuario.nome[0].upper() }}
+        {% endif %}
+        
+        
+        <span class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></span>
+      </div>
+      
+      <h2 class="font-extrabold text-xl text-gray-900 mb-1">{{ usuario.nome }}</h2>
+      <p class="text-sm text-gray-500 mb-6">{{ usuario.email }}</p>
+      
+     
+      <div class="inline-flex items-center gap-1.5 bg-yellow-50 text-yellow-700 px-4 py-2.5 rounded-2xl text-sm font-bold mb-6 border border-yellow-100 w-full justify-center">
+        <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        {{ "%.1f"|format(usuario.reputacao_acumulada) }} 
+        <span class="font-medium text-yellow-600 text-xs ml-1">({{ usuario.total_alugueis }} aluguéis)</span>
+      </div>
+      
+      <div class="pt-6 border-t border-gray-50">
+        <p class="text-[10px] text-gray-400 uppercase font-bold text-left mb-2 tracking-wider">Status da Conta</p>
+        <div class="flex">
+          <span class="bg-green-100 text-green-700 px-3 py-1.5 rounded-full font-bold uppercase text-[10px] tracking-wider">{{ usuario.status_conta }}</span>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="md:col-span-8 bg-white rounded-3xl shadow-soft border border-gray-100 p-8 md:p-10">
+      
+      <h3 class="font-bold text-gray-900 mb-6 text-xl">Atualizar Dados Pessoais</h3>
+      
+      <form method="POST" action="/perfil" enctype="multipart/form-data" class="space-y-6">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Telefone</label>
+            <input type="text" name="telefone" value="{{ usuario.telefone or '' }}" 
+                   class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all shadow-sm">
+          </div>
+          
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Bairro</label>
+            <input type="text" name="bairro" value="{{ usuario.bairro or '' }}" 
+                   class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all shadow-sm">
+          </div>
+          
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Endereço Completo</label>
+            <input type="text" name="endereco" value="{{ usuario.endereco or '' }}" 
+                   class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all shadow-sm">
+          </div>
+          
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Nova Foto de Perfil</label>
+            <div class="flex items-center gap-4 w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5 transition-all shadow-sm hover:bg-white">
+              <input type="file" name="foto" accept="image/*" 
+                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer outline-none">
+            </div>
+          </div>
+        </div>
+        
+        <div class="pt-4">
+          <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 w-full sm:w-auto">
+            Salvar Alterações
+          </button>
+        </div>
+      </form>
+
+      
+      <div class="mt-12 pt-8 border-t border-gray-100">
+        <div class="bg-red-50 border border-red-100 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div>
+            <h3 class="font-extrabold text-red-600 mb-2">Atenção</h3>
+            <p class="text-sm text-red-800/80 leading-relaxed max-w-md">
+              A exclusão da conta é irreversível. Todos os seus anúncios serão removidos e os seus dados pessoais serão anonimizados de acordo com as diretrizes da LGPD.
+            </p>
+          </div>
+          <a href="/perfil/excluir" onclick="return confirm('Tem certeza absoluta que deseja excluir sua conta? Esta ação não pode ser desfeita.')" 
+             class="whitespace-nowrap bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all shadow-sm">
+            Excluir Minha Conta
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
